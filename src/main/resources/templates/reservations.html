@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta http-equiv="Content-Type" content="application/json; charset=UTF-8">
+    <title>Reservations | Library</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/5.2.0/css/bootstrap.min.css}">
+</head>
+<body>
+
+<div><h1>Reservations made in our library:</h1></div>
+
+<div>
+    <div style="div" class="btn-group" role="group">
+        <a th:href="@{books}" class="btn btn-primary" id="booksButton">View Books</a>
+        <a th:href="@{authors}" class="btn btn-primary" id="authorsButton">View Authors</a>
+        <a th:href="@{students}" class="btn btn-primary" id="studentsButton">View Students</a>
+        <br>
+    </div>
+
+    <table class="table table-primary table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Student Id Code</th>
+            <th scope="col">Student First Name</th>
+            <th scope="col">Student Last Name</th>
+            <th scope="col">Student E-mail</th>
+            <th scope="col">Book Title</th>
+            <th scope="col">Publication Date</th>
+            <th scope="col">Number of Pages</th>
+            <th scope="col">Author First Name</th>
+            <th scope="col">Author Last Name</th>
+            <th scope="col">Author E-mail</th>
+            <th scope="col">Book Took On</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${listReservations}" class="table-info">
+            <td th:text="${reservation.id}"/></td>
+            <td th:text="${reservation.student.identificationCode}"/></td>
+            <td th:text="${reservation.student.firstName}"/></td>
+            <td th:text="${reservation.student.lastName}"/></td>
+            <td th:text="${reservation.student.email}"/></td>
+            <td th:text="${reservation.book.title}"/></td>
+            <td th:text="${reservation.book.publicationDate}"/></td>
+            <td th:text="${reservation.book.numberOfPages}"/></td>
+            <td th:text="${reservation.book.author.firstName}"/></td>
+            <td th:text="${reservation.book.author.lastName}"/></td>
+            <td th:text="${reservation.book.author.email}"/></td>
+            <td th:text="${reservation.tookOn}"/></td>
+            <td>
+                <div class="btn-group" role="group">
+                    <a th:href="@{reservations/findById/(id=${reservation.id})}" class="btn btn-primary" id="editButton">Edit</a>
+                    <a th:href="@{reservations/delete/(id=${reservation.id})}" class="btn btn-danger" id="deleteButton">Delete</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addReservation">Add reservation</button>
+
+<div class="modal fade" id="addReservation" tabindex="-1" aria-labelledby="addReservationLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addReservationLabel">New reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/reservations/add}" method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="tookOn" class="col-form-label">Book took on:</label>
+                        <input type="text" class="form-control" id="tookOn" name="tookOn">
+                    </div>
+                    <div class="form-group">
+                        <label for="student" class="col-form-label">Student:</label>
+                        <select class="form-control" id="student" name="student">
+                            <option>Select student for reservation</option>
+                            <option th:each="student : ${listStudents}"
+                                    th:value="${student.id}"
+                                    th:text="${student.firstName} + ' ' + ${student.lastName}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="book" class="col-form-label">Book:</label>
+                        <select class="form-control" id="book" name="book">
+                            <option>Select book for reservation</option>
+                            <option th:each="book : ${listBooks}"
+                                    th:value="${book.id}"
+                                    th:text="${book.title}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add reservation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteReservation" tabindex="-1" aria-labelledby="deleteReservationLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteReservationLabel">Delete reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this reservation record?</p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" id="confirmDelete" href="">Confirm</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editReservation" tabindex="-1" aria-labelledby="editReservationLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editReservationLabel">Edit reservation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/reservations/edit}" method="put">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="id" class="col-form-label">Reservation Id:</label>
+                        <input type="text" class="form-control" id="id" name="id" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="tookOn" class="col-form-label">Book took on:</label>
+                        <input type="text" class="form-control" name="tookOn">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Edit reservation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.6.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.2.0/js/bootstrap.min.js}"></script>
+<script src="js/reservations.js"></script>
+
+</body>
+</html>
